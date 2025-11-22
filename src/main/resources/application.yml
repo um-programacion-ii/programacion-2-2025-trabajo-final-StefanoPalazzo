@@ -29,7 +29,7 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 jwt:
-  secret: supersecreto123456789supersecreto123456789
+  secret: "2c08c8f9dfe21ab87e7683123a518b9283743ffeb1c0f233bc12e8b9123aa239"
   expiration: 86400000   # 24h
 
 catedra:
