@@ -1,4 +1,4 @@
-package com.stefanopalazzo.eventosbackend.eventosbackend;
+package com.stefanopalazzo.eventosbackend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
