@@ -43,3 +43,6 @@ catedra:
   realizar-venta: ${catedra.base-url}/realizar-venta
   listar-ventas: ${catedra.base-url}/listar-ventas
   listar-venta: ${catedra.base-url}/listar-venta
+  username: admin
+  password: admin
+#  base-url: "https://prog2-events.azurewebsites.net"
