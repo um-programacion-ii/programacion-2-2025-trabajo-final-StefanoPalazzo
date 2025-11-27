@@ -1,4 +1,7 @@
 package com.stefanopalazzo.eventosbackend.asiento;
 
-public class AsientoEstado {
+public enum AsientoEstado {
+    LIBRE,
+    BLOQUEADO,
+    VENDIDO
 }
