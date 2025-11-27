@@ -30,7 +30,7 @@ spring:
 
 jwt:
   secret: "2c08c8f9dfe21ab87e7683123a518b9283743ffeb1c0f233bc12e8b9123aa239"
-  expiration: 86400000   # 24h
+  expiration: 8640000000   # 24h
 
 catedra:
   base-url: http://192.168.194.250:8080/api/endpoints/v1
