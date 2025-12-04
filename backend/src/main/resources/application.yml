@@ -7,13 +7,19 @@ spring:
     username: eventos_user
     password: eventos_pass
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
 
   jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update   # durante desarrollo; más adelante "validate"
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 
   redis:
@@ -30,7 +36,7 @@ spring:
 
 jwt:
   secret: "2c08c8f9dfe21ab87e7683123a518b9283743ffeb1c0f233bc12e8b9123aa239"
-  expiration: 8640000000   # 24h
+  expiration: 8640000000
 
 catedra:
   base-url: http://192.168.194.250:8080/api/endpoints/v1
@@ -45,4 +51,3 @@ catedra:
   listar-venta: ${catedra.base-url}/listar-venta
   username: admin
   password: admin
-#  base-url: "https://prog2-events.azurewebsites.net"

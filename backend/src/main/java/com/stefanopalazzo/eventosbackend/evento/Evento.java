@@ -34,7 +34,8 @@ public class Evento {
     private String imagen;
 
     private int filaAsientos;
-    private int columnaAsientos;
+    @Column(name = "columna_asientos")
+    private int columnAsientos;
 
     private String ultimaActualizacion;
 }
