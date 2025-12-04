@@ -1,0 +1,3 @@
+org.springframework.test.context.ContextCustomizerFactory = \
+    com.stefanopalazzo.proxy.config.\
+    KafkaTestContainersSpringContextCustomizerFactory

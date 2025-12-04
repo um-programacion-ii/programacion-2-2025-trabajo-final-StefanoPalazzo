@@ -1,0 +1,33 @@
+{
+  "generator-jhipster": {
+    "applicationType": "microservice",
+    "authenticationType": "jwt",
+    "baseName": "eventosproxy",
+    "buildTool": "maven",
+    "cacheProvider": "no",
+    "clientFramework": "no",
+    "clientTheme": "none",
+    "clientThemeVariant": "",
+    "creationTimestamp": 1,
+    "databaseType": "no",
+    "devDatabaseType": "no",
+    "enableHibernateCache": false,
+    "enableTranslation": false,
+    "entities": [],
+    "jhipsterVersion": "8.11.0",
+    "jwtSecretKey": "MDVhNTE0MGRkYWY4MzM5ZjFjY2M5YjcwNjNiMzBiNTAxYTIzYjk3ODFkODU0NTViMzM5M2U2MWRjNDVkYzIzNDdiOGUzMGU3MzhhMjZhZGY5ZjhkM2EzM2Q0NGQ1YzJhNGYzNTEyZTk1MWI4OTg4YmI3YjgyNGI5OGIxODE5Y2E=",
+    "languages": [],
+    "messageBroker": "kafka",
+    "monorepository": true,
+    "packageName": "com.stefanopalazzo.proxy",
+    "prodDatabaseType": "no",
+    "reactive": false,
+    "searchEngine": "no",
+    "serverPort": "8085",
+    "serviceDiscoveryType": false,
+    "skipClient": true,
+    "skipCommitHook": true,
+    "skipUserManagement": true,
+    "testFrameworks": []
+  }
+}
