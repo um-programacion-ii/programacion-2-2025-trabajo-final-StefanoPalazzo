@@ -45,7 +45,7 @@ public class EventSyncService {
                     .direccion(full.getDireccion())
                     .imagen(full.getImagen())
                     .filaAsientos(full.getFilaAsientos())
-                    .columnaAsientos(full.getColumnaAsientos())
+                    .columnAsientos(full.getColumnAsientos())
                     .ultimaActualizacion(LocalDateTime.now().toString())
                     .build();
 

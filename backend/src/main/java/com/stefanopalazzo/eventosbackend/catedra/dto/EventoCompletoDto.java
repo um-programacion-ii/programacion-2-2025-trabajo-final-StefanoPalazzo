@@ -17,7 +17,7 @@ public class EventoCompletoDto {
     private String direccion;
     private String imagen;
     private int filaAsientos;
-    private int columnaAsientos;
+    private int columnAsientos;
 
     private List<IntegranteDto> integrantes;
 }
