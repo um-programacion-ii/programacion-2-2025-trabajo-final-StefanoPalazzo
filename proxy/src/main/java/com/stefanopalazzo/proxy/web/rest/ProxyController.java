@@ -18,73 +18,56 @@ public class ProxyController {
     private String cachedToken;
 
     private String login() {
-        try {
-            if (cachedToken != null) {
-                return cachedToken;
-            }
+        if (cachedToken != null) return cachedToken;
 
-            String url = "http://localhost:8081/api/login";
+        String url = "http://backend:8081/api/login";
+        Map<String, String> req = Map.of("username", "stefano", "password", "1234");
 
-            Map<String, String> req = Map.of(
-                "username", "stefano",
-                "password", "1234"
-            );
+        log.info("➡ Haciendo login contra {}", url);
 
-            log.info("➡ Haciendo login contra {}", url);
+        ResponseEntity<Map> response = restTemplate.postForEntity(url, req, Map.class);
+        cachedToken = response.getBody().get("token").toString();
 
-            ResponseEntity<Map> response =
-                restTemplate.postForEntity(url, req, Map.class);
+        log.info("✔ TOKEN obtenido");
+        return cachedToken;
+    }
 
-            cachedToken = response.getBody().get("token").toString();
+    private ResponseEntity<?> proxyGet(String backendUrl) {
+        String token = login();
 
-            log.info("✔ TOKEN obtenido");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
 
-            return cachedToken;
+        ResponseEntity<byte[]> backendResponse =
+            restTemplate.exchange(backendUrl, HttpMethod.GET, new HttpEntity<>(headers), byte[].class);
 
-        } catch (Exception e) {
-            log.error("❌ ERROR al hacer login: {}", e.getMessage());
-            throw e;
+        // Construir headers seguros
+        HttpHeaders clean = new HttpHeaders();
+        MediaType ct = backendResponse.getHeaders().getContentType();
+
+        if (ct == null) {
+            clean.setContentType(MediaType.APPLICATION_JSON);
+        } else {
+            clean.setContentType(ct);
         }
+
+        return new ResponseEntity<>(backendResponse.getBody(), clean, backendResponse.getStatusCode());
     }
 
     @GetMapping("/eventos-locales")
-    public ResponseEntity<String> eventosLocales() {
+    public ResponseEntity<?> eventosLocales() {
         log.info("➡ /proxy/eventos-locales");
-
-        String token = login();
-        String url = "http://localhost:8081/api/catedra/eventos";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-            url, HttpMethod.GET, new HttpEntity<>(headers), String.class
-        );
-
-        return ResponseEntity.ok(response.getBody());
+        return proxyGet("http://backend:8081/api/catedra/eventos");
     }
-    @GetMapping("/ping")
-    public ResponseEntity<String> ping() {
-        log.info("PING OK");
-        return ResponseEntity.ok("pong");
-    }
-
-
 
     @GetMapping("/eventos-remotos")
-    public ResponseEntity<String> eventosRemotos() {
+    public ResponseEntity<?> eventosRemotos() {
         log.info("➡ /proxy/eventos-remotos");
+        return proxyGet("http://backend:8081/api/catedra-sync/eventos");
+    }
 
-        String token = login();
-        String url = "http://localhost:8081/api/catedra-sync/eventos";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-            url, HttpMethod.GET, new HttpEntity<>(headers), String.class
-        );
-
-        return ResponseEntity.ok(response.getBody());
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
     }
 }
