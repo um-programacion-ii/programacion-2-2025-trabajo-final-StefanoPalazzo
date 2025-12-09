@@ -1,0 +1,37 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: eventosproxy
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+  security:
+    authentication:
+      jwt:
+        base64-secret: cG8tbXktc2VjcmV0LWFwcA==
+        token-validity-in-seconds: 86400
+
+  docker:
+    compose:
+      enabled: false
+
+  main:
+    web-application-type: servlet
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+jhipster:
+  clientApp:
+    name: eventosproxyApp
+
+logging:
+  level:
+    root: INFO
+    com.stefanopalazzo: DEBUG
