@@ -17,6 +17,13 @@ public class EventSyncService {
     private final CatedraClient catedraClient;
     private final EventoRepository eventoRepository;
 
+    public void sincronizarEventoIndividual(Object data) {
+        System.out.println("📥 Backend recibió evento individual: " + data);
+
+        // TODO: parsear el objeto, mapear a Evento y guardarlo.
+        // Por ahora solo hacemos log para verificar el flujo.
+    }
+
     public int sincronizar() {
 
         List<EventoResumidoDto> lista;
