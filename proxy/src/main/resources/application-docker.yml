@@ -1,0 +1,14 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: proxy-group
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+proxy:
+  backend-url: http://backend:8081
+  token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzdGVmYW5vIiwiaWF0IjoxNzY1NDcxNTI2LCJleHAiOjE3NzQxMTE1MjZ9.WWwYQBVXozi0O4kmY4N9pMCgtf3BgYufhjHuYT42vfU"
+

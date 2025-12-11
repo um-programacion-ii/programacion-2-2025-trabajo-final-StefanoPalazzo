@@ -1,0 +1,17 @@
+spring:
+  kafka:
+    bootstrap-servers: 192.168.194.250:9092
+    consumer:
+      group-id: proxy-group
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+proxy:
+  backend-url: http://eventos_backend:8081
+  chair-url: http://192.168.194.250:8080
+  redis:
+    host: 192.168.194.250
+    port: 6379
+

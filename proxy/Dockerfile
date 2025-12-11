@@ -1,6 +1,6 @@
 FROM eclipse-temurin:17-jdk
 WORKDIR /app
-COPY target/eventosproxy-0.0.1-SNAPSHOT.jar app.jar
-
+COPY target/proxy-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8085
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["java","-jar","/app/app.jar","--spring.profiles.active=docker"]
+
