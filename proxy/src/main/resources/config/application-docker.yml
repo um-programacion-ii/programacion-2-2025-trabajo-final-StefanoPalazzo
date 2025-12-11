@@ -1,0 +1,19 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: eventosproxy
+  security:
+    authentication:
+      jwt:
+        base64-secret: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=
+        token-validity-in-seconds: 86400
+
+jhipster:
+  security:
+    authentication:
+      jwt:
+        base64-secret: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 2592000

@@ -42,6 +42,11 @@ spring:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
+  cloud:
+    stream:
+      enabled: false
+    function:
+      definition: none
 
 server:
   port: 8085
@@ -55,6 +60,14 @@ server:
 # ===================================================================
 
 jhipster:
+  clientApp:
+    name: eventosproxy
+  security:
+    authentication:
+      jwt:
+        base64-secret: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 2592000
   # CORS is disabled by default on microservices, as you should access them through a gateway.
   # If you want to enable it, please uncomment the configuration below.
   # cors:
@@ -89,3 +102,9 @@ jhipster:
 # ===================================================================
 
 # application:
+application:
+  kafka:
+    enabled: true        # <- ESTA ES LA CLAVE
+    consumer:
+      topic: eventos-sync
+      group-id: proxy-group

@@ -19,6 +19,7 @@ import tech.jhipster.config.DefaultProfileUtil;
 import tech.jhipster.config.JHipsterConstants;
 
 @SpringBootApplication
+@EnableKafka
 @EnableConfigurationProperties({ ApplicationProperties.class })
 public class EventosproxyApp {
 
