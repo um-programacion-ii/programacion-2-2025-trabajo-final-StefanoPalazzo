@@ -28,6 +28,7 @@ public class ProxySyncResource {
     public ProxySyncResource(RestTemplate restTemplate, StringRedisTemplate redisTemplate) {
         this.restTemplate = restTemplate;
         this.redisTemplate = redisTemplate;
+        log.info("ProxySyncResource initialized!");
     }
 
     @GetMapping("/test")

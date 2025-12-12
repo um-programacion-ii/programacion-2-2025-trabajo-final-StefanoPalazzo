@@ -9,8 +9,9 @@ spring:
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 proxy:
-  backend-url: http://eventos_backend:8081
-  chair-url: http://192.168.194.250:8080
+  backend-url: http://localhost:8081
+  chair-url: http://192.168.194.250:8080/api
+  token: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdGVmYW5vcGFsYXp6b190ZXN0IiwiZXhwIjoxNzY4MDg4OTI0LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY1NDk2OTI0fQ.OaVwxtYsFJ4f0LyesNrdZRQHsTHfSmVHWGHdsfAJvTY_LYCJHhtochoEIw0-F_nwY3TabfQoWU_C2pNUpSv7WA"
   redis:
     host: 192.168.194.250
     port: 6379
