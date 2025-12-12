@@ -6,6 +6,8 @@ import com.stefanopalazzo.eventosbackend.venta.VentaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/carrito")
 @RequiredArgsConstructor
@@ -15,24 +17,24 @@ public class CarritoController {
     private final VentaService ventaService;
 
     @GetMapping
-    public Carrito ver() {
+    public List<CarritoItem> ver() {
         return carritoService.getCarrito();
     }
 
     @PostMapping("/agregar")
-    public Carrito agregar(@RequestBody CarritoItem item) {
+    public List<CarritoItem> agregar(@RequestBody CarritoItem item) {
         carritoService.agregarItem(item);
         return carritoService.getCarrito();
     }
 
-    @DeleteMapping("/quitar")
-    public Carrito quitar(@RequestBody QuitarItemDto req) {
-
-        carritoService.quitarItem(req.getEventoId(), req.getFila(), req.getColumna());
-
+    @DeleteMapping("/quitar/{eventoId}/{fila}/{columna}")
+    public List<CarritoItem> quitar(
+            @PathVariable int eventoId,
+            @PathVariable int fila,
+            @PathVariable int columna) {
+        carritoService.quitarItem(eventoId, fila, columna);
         return carritoService.getCarrito();
     }
-
 
     @DeleteMapping("/limpiar")
     public String limpiar() {
