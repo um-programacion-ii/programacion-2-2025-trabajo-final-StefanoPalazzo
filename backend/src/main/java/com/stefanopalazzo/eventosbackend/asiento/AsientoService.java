@@ -2,46 +2,66 @@ package com.stefanopalazzo.eventosbackend.asiento;
 
 import com.stefanopalazzo.eventosbackend.carrito.Carrito;
 import com.stefanopalazzo.eventosbackend.carrito.CarritoItem;
+import com.stefanopalazzo.eventosbackend.evento.EventSyncService;
+import com.stefanopalazzo.eventosbackend.evento.Evento;
+import com.stefanopalazzo.eventosbackend.evento.EventoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AsientoService {
 
     private final AsientoRepository asientoRepository;
-    private final Carrito carrito;
 
-    @PostConstruct
-    public void generarAsientos() {
-        generar(1, 10, 12, 2577.20);
-        generar(2, 12, 14, 4514.52);
-    }
-
-    private void generar(int eventoId, int filas, int columnas, double precio) {
-        if (asientoRepository.findByEventoId(eventoId).isEmpty()) {
-            for (int f = 1; f <= filas; f++) {
-                for (int c = 1; c <= columnas; c++) {
-                    asientoRepository.save(
-                            Asiento.builder()
-                                    .eventoId(eventoId)
-                                    .fila(f)
-                                    .columna(c)
-                                    .estado(AsientoEstado.LIBRE)
-                                    .precio(precio)
-                                    .build()
-                    );
-                }
-            }
-        }
-    }
+    private final EventSyncService eventSyncService;
+    private final EventoRepository eventoRepository;
 
     public List<Asiento> asientosDelEvento(int eventoId) {
-        return asientoRepository.findByEventoId(eventoId);
+        Evento evento = eventoRepository.findById(eventoId).orElse(null);
+        if (evento == null)
+            return new ArrayList<>();
+
+        Map<String, String> proxyMap = eventSyncService.getSeatMapFromProxy(eventoId);
+        List<Asiento> lista = new ArrayList<>();
+
+        for (int f = 1; f <= evento.getFilaAsientos(); f++) {
+            for (int c = 1; c <= evento.getColumnAsientos(); c++) {
+                String key = f + "_" + c;
+                String estadoStr = proxyMap.getOrDefault(key, "Libre");
+                AsientoEstado estado = mapEstado(estadoStr);
+
+                Asiento a = Asiento.builder()
+                        .eventoId(eventoId)
+                        .fila(f)
+                        .columna(c)
+                        .estado(estado)
+                        .precio(evento.getPrecioEntrada())
+                        .build();
+                lista.add(a);
+            }
+        }
+        return lista;
+    }
+
+    private AsientoEstado mapEstado(String estado) {
+        if (estado == null)
+            return AsientoEstado.LIBRE;
+        // The Chair's Redis returns "Bloqueado", "Vendido" (Capitalized?)
+        // Let's be case insensitive
+        switch (estado.toLowerCase()) {
+            case "bloqueado":
+                return AsientoEstado.BLOQUEADO;
+            case "vendido":
+                return AsientoEstado.VENDIDO;
+            default:
+                return AsientoEstado.LIBRE;
+        }
     }
 
     public Asiento findById(Long id) {
@@ -49,14 +69,22 @@ public class AsientoService {
     }
 
     public Asiento bloquear(int eventoId, int fila, int columna) {
-        Asiento asiento = asientoRepository.findByEventoIdAndFilaAndColumna(eventoId, fila, columna)
-                .orElseThrow(() -> new RuntimeException("No existe ese asiento"));
+        List<Map<String, Integer>> asientos = new ArrayList<>();
+        Map<String, Integer> asientoMap = Map.of("fila", fila, "columna", columna);
+        asientos.add(asientoMap);
 
-        if (asiento.getEstado() != AsientoEstado.LIBRE)
-            throw new RuntimeException("Asiento no disponible");
+        boolean success = eventSyncService.bloquearAsientos(eventoId, asientos);
 
-        asiento.setEstado(AsientoEstado.BLOQUEADO);
-        return asientoRepository.save(asiento);
+        if (success) {
+            return Asiento.builder()
+                    .eventoId(eventoId)
+                    .fila(fila)
+                    .columna(columna)
+                    .estado(AsientoEstado.BLOQUEADO)
+                    .build();
+        } else {
+            throw new RuntimeException("No se pudo bloquear el asiento");
+        }
     }
 
     public void liberar(int eventoId, int fila, int columna) {
@@ -70,22 +98,41 @@ public class AsientoService {
     }
 
     public List<Asiento> venderAsientos(List<CarritoItem> items) {
+        if (items.isEmpty())
+            return new ArrayList<>();
 
-        List<Asiento> vendidos = new ArrayList<>();
+        int eventoId = items.get(0).getEventoId();
+        List<Map<String, Object>> asientosParaProxy = new ArrayList<>();
+        double totalPrecio = 0;
 
         for (CarritoItem item : items) {
+            Map<String, Object> asientoMap = new HashMap<>();
+            asientoMap.put("fila", item.getFila());
+            asientoMap.put("columna", item.getColumna());
+            asientoMap.put("persona", "Usuario Generico"); // TODO: Get real user name
+            asientosParaProxy.add(asientoMap);
+            // Assuming fixed price or fetching from event, for now placeholder
+            totalPrecio += 1000.0;
+        }
 
+        boolean success = eventSyncService.realizarVenta(eventoId, totalPrecio, asientosParaProxy);
+
+        if (!success) {
+            throw new RuntimeException("La venta fue rechazada por la cátedra");
+        }
+
+        List<Asiento> vendidos = new ArrayList<>();
+        for (CarritoItem item : items) {
             Asiento asiento = asientoRepository
                     .findByEventoIdAndFilaAndColumna(item.getEventoId(), item.getFila(), item.getColumna())
-                    .orElseThrow(() -> new RuntimeException("Asiento no encontrado"));
-
-            if (asiento.getEstado() != AsientoEstado.BLOQUEADO) {
-                throw new RuntimeException("El asiento ya no está disponible");
-            }
+                    .orElse(Asiento.builder()
+                            .eventoId(item.getEventoId())
+                            .fila(item.getFila())
+                            .columna(item.getColumna())
+                            .build());
 
             asiento.setEstado(AsientoEstado.VENDIDO);
             asientoRepository.save(asiento);
-
             vendidos.add(asiento);
         }
 

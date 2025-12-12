@@ -1,6 +1,9 @@
 server:
   port: 8081
 
+app:
+  proxy-url: http://localhost:8085
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/eventos_db
