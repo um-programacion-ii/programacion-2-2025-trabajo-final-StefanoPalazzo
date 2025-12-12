@@ -2,26 +2,38 @@ package com.stefanopalazzo.eventosbackend.controller;
 
 import com.stefanopalazzo.eventosbackend.security.JwtUtil;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class LoginController {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
     public TokenResponse login(@RequestBody LoginRequest request) {
+        try {
+            // Authenticate using Spring Security
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()));
 
-        // Validación ultra simple por ahora
-        if (!request.getPassword().equals("1234")) {
-            throw new RuntimeException("Credenciales inválidas");
+            // Generate JWT token
+            String token = jwtUtil.generateToken(request.getUsername());
+            return new TokenResponse(token);
+
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException("Usuario o contraseña incorrectos");
         }
-
-        String token = jwtUtil.generateToken(request.getUsername());
-        return new TokenResponse(token);
     }
 
     @Data

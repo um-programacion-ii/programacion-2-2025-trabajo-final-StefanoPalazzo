@@ -38,10 +38,32 @@ public class EventSyncService {
     }
 
     public void handleUpdate(String message) {
-        log.info("Procesando actualización: {}", message);
-        // Here we could parse the message to see if it's a specific event update
-        // and then call sincronizarEventoIndividual or invalidate cache.
-        // For now, we just log it.
+        log.info("Procesando actualización de Kafka: {}", message);
+
+        try {
+            // Parse the Kafka message to extract event ID
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(message);
+
+            // Check if message contains eventoId
+            if (root.has("eventoId")) {
+                Long eventoId = root.get("eventoId").asLong();
+                log.info("Sincronizando evento individual: {}", eventoId);
+                sincronizarEventoIndividual(eventoId);
+            } else {
+                // If no specific event ID, sync all events
+                log.info("Mensaje sin eventoId específico, sincronizando todos los eventos");
+                sincronizar();
+            }
+        } catch (Exception e) {
+            log.error("Error al procesar actualización de Kafka: {}", e.getMessage(), e);
+            // Fallback: sync all events if parsing fails
+            try {
+                sincronizar();
+            } catch (Exception syncError) {
+                log.error("Error en sincronización de respaldo: {}", syncError.getMessage());
+            }
+        }
     }
 
     public Map<String, String> getSeatMapFromProxy(int eventoId) {
