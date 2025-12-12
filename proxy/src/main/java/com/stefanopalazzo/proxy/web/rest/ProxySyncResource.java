@@ -58,17 +58,26 @@ public class ProxySyncResource {
         return restTemplate.postForObject(url, buildEntity(body), String.class);
     }
 
-    @PostMapping("/liberar-asientos")
-    public String liberar(@RequestBody String body) {
-        String url = chairUrl + "/endpoints/v1/liberar-asientos";
-        log.info("Proxy -> Forwarding to Chair: {}", url);
-        return restTemplate.postForObject(url, buildEntity(body), String.class);
-    }
-
     @PostMapping("/realizar-venta")
     public String realizarVenta(@RequestBody String body) {
         String url = chairUrl + "/endpoints/v1/realizar-venta";
         log.info("Proxy -> Forwarding to Chair: {}", url);
         return restTemplate.postForObject(url, buildEntity(body), String.class);
+    }
+
+    @GetMapping("/listar-ventas")
+    public String listarVentas() {
+        String url = chairUrl + "/endpoints/v1/listar-ventas";
+        log.info("Proxy -> Forwarding to Chair: {}", url);
+        return restTemplate.exchange(url, org.springframework.http.HttpMethod.GET, buildEntity(null), String.class)
+                .getBody();
+    }
+
+    @GetMapping("/listar-venta/{id}")
+    public String listarVenta(@PathVariable Long id) {
+        String url = chairUrl + "/endpoints/v1/listar-venta/" + id;
+        log.info("Proxy -> Forwarding to Chair: {}", url);
+        return restTemplate.exchange(url, org.springframework.http.HttpMethod.GET, buildEntity(null), String.class)
+                .getBody();
     }
 }

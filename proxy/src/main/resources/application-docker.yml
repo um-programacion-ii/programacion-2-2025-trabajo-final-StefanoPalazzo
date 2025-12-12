@@ -2,7 +2,7 @@ spring:
   kafka:
     bootstrap-servers: 192.168.194.250:9092
     consumer:
-      group-id: proxy-group
+      group-id: stefanopalazzo-proxy-group
       auto-offset-reset: earliest
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
