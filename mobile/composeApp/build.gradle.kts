@@ -44,6 +44,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             // Ktor Android
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.koin.android)
         }
         
         iosMain.dependencies {
@@ -61,7 +62,8 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            
+            implementation(compose.materialIconsExtended)
+
             // Ktor
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.contentNegotiation)
