@@ -1,6 +1,8 @@
 package com.stefanopalazzo.eventosapp.presentation.auth
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -8,28 +10,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
-@OptIn(ExperimentalMaterial3Api::class)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
-    onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit,
-    viewModel: LoginViewModel = koinViewModel()
+fun RegisterScreen(
+    onRegisterSuccess: () -> Unit,
+    onBackClick: () -> Unit,
+    viewModel: RegisterViewModel = koinViewModel()
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    
     val uiState by viewModel.uiState.collectAsState()
     
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            onLoginSuccess()
+            onRegisterSuccess()
+            viewModel.resetState()
         }
     }
     
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Eventos App") }
+                title = { Text("Crear Cuenta") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Text("<") // TODO: Use proper icon
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -37,16 +49,10 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Iniciar Sesión",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
-            
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
@@ -68,12 +74,45 @@ fun LoginScreen(
                 singleLine = true
             )
             
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isLoading,
+                singleLine = true
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            OutlinedTextField(
+                value = firstName,
+                onValueChange = { firstName = it },
+                label = { Text("Nombre") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isLoading,
+                singleLine = true
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            OutlinedTextField(
+                value = lastName,
+                onValueChange = { lastName = it },
+                label = { Text("Apellido") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isLoading,
+                singleLine = true
+            )
+            
             Spacer(modifier = Modifier.height(24.dp))
             
             Button(
-                onClick = { viewModel.login(username, password) },
+                onClick = { viewModel.register(username, password, email, firstName, lastName) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !uiState.isLoading && username.isNotBlank() && password.isNotBlank()
+                enabled = !uiState.isLoading && username.isNotBlank() && password.isNotBlank() && email.isNotBlank()
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(
@@ -81,17 +120,8 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Iniciar Sesión")
+                    Text("Registrarse")
                 }
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            TextButton(
-                onClick = onNavigateToRegister,
-                enabled = !uiState.isLoading
-            ) {
-                Text("¿No tenés cuenta? Registrate")
             }
             
             uiState.error?.let { error ->
