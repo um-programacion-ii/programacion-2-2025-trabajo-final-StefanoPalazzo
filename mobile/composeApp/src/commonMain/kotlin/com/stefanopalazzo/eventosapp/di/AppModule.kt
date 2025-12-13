@@ -10,7 +10,9 @@ import com.stefanopalazzo.eventosapp.presentation.auth.RegisterViewModel
 import com.stefanopalazzo.eventosapp.presentation.checkout.CheckoutViewModel
 import com.stefanopalazzo.eventosapp.presentation.events.EventDetailViewModel
 import com.stefanopalazzo.eventosapp.presentation.events.EventListViewModel
+import com.stefanopalazzo.eventosapp.presentation.profile.ProfileViewModel
 import com.stefanopalazzo.eventosapp.presentation.seats.SeatSelectionViewModel
+import com.stefanopalazzo.eventosapp.presentation.tickets.MyTicketsViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -33,4 +35,6 @@ val appModule = module {
     viewModel { EventDetailViewModel(get()) }
     viewModel { SeatSelectionViewModel(get(), get()) }
     viewModel { CheckoutViewModel(get(), get()) }
+    viewModel { MyTicketsViewModel(get()) }
+    viewModel { ProfileViewModel(get()) }
 }
