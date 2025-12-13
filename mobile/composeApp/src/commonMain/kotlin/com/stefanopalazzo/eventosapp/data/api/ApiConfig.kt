@@ -28,6 +28,7 @@ object ApiConfig {
     
     // Cambiar según tu entorno de desarrollo
     private const val DEVELOPMENT_URL = "http://10.0.2.2:8081" // Android Emulator por defecto
+    val PROXY_URL = "http://10.0.2.2:8085" // Android Emulator por defecto
     
     // URL de producción (cuando la app esté publicada)
     private const val PRODUCTION_URL = "https://api.tuapp.com"

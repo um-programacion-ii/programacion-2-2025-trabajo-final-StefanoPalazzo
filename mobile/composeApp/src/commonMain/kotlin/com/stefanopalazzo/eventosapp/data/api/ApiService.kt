@@ -112,15 +112,28 @@ class ApiService(private val apiClient: ApiClient) {
     
     suspend fun bloquearAsientos(request: BloquearAsientosRequest): Result<BloquearAsientosResponse> {
         return try {
-            val response = client.post("$baseUrl/api/catedra/bloquear-asientos") {
+            val url = "http://10.0.2.2:8085/proxy/bloquear-asientos"
+            println("ApiService: Bloqueando asientos en $url")
+            println("ApiService: Request body: $request")
+            
+            val response = client.post(url) {
                 setBody(request)
             }
+            
+            println("ApiService: Response status: ${response.status}")
+            
             if (response.status == io.ktor.http.HttpStatusCode.OK) {
-                Result.success(response.body())
+                val body = response.body<BloquearAsientosResponse>()
+                println("ApiService: Response body: $body")
+                Result.success(body)
             } else {
-                Result.failure(Exception("Error al bloquear asientos: ${response.status}"))
+                val errorBody = response.body<String>()
+                println("ApiService: Error body: $errorBody")
+                Result.failure(Exception("Error al bloquear asientos: ${response.status} - $errorBody"))
             }
         } catch (e: Exception) {
+            println("ApiService: Exception: ${e.message}")
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -128,11 +141,28 @@ class ApiService(private val apiClient: ApiClient) {
     // Venta
     suspend fun realizarVenta(request: RealizarVentaRequest): Result<RealizarVentaResponse> {
         return try {
-            val response = client.post("$baseUrl/api/carrito/finalizar/${request.eventoId}") {
+            val url = "${ApiConfig.PROXY_URL}/proxy/realizar-venta"
+            println("ApiService: Realizando venta en $url")
+            println("ApiService: Request body: $request")
+            
+            val response = client.post(url) {
                 setBody(request)
             }
-            Result.success(response.body())
+            
+            println("ApiService: Response status: ${response.status}")
+            
+            if (response.status == io.ktor.http.HttpStatusCode.OK) {
+                val body = response.body<RealizarVentaResponse>()
+                println("ApiService: Response body: $body")
+                Result.success(body)
+            } else {
+                val errorBody = response.body<String>()
+                println("ApiService: Error body: $errorBody")
+                Result.failure(Exception("Error al realizar venta: ${response.status} - $errorBody"))
+            }
         } catch (e: Exception) {
+            println("ApiService: Exception: ${e.message}")
+            e.printStackTrace()
             Result.failure(e)
         }
     }
