@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.stefanopalazzo.eventosapp.data.models.EventoResumido
 import org.koin.compose.viewmodel.koinViewModel
+@OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 fun EventListScreen(
