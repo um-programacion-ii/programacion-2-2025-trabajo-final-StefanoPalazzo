@@ -15,6 +15,19 @@ class AuthRepository(
         }
     }
     
+    suspend fun register(username: String, password: String, email: String, firstName: String, lastName: String): Result<Boolean> {
+        val request = com.stefanopalazzo.eventosapp.data.models.RegisterRequest(
+            username = username,
+            password = password,
+            email = email,
+            firstName = firstName,
+            lastName = lastName
+        )
+        return apiService.register(request).map { response ->
+            response.success
+        }
+    }
+    
     suspend fun logout(): Result<Unit> {
         return apiService.logout()
     }

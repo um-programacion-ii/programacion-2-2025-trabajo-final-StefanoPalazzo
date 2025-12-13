@@ -4,10 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AsientoRedis(
+    val id: Long? = null,
+    val eventoId: Int,
     val fila: Int,
     val columna: Int,
-    val estado: String, // "Bloqueado" o "Vendido"
-    val expira: String? = null // Solo para bloqueados
+    val estado: String, // "LIBRE", "BLOQUEADO", "VENDIDO"
+    val precio: Double
 )
 
 @Serializable

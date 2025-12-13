@@ -14,6 +14,22 @@ data class LoginResponse(
 )
 
 @Serializable
+data class RegisterRequest(
+    val username: String,
+    val password: String,
+    val email: String,
+    val firstName: String,
+    val lastName: String
+)
+
+@Serializable
+data class RegisterResponse(
+    val success: Boolean,
+    val message: String,
+    val username: String? = null
+)
+
+@Serializable
 data class ErrorResponse(
     val status: Int,
     val error: String,

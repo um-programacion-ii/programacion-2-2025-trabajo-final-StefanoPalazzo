@@ -17,14 +17,6 @@ import kotlinx.serialization.json.Json
 
 class ApiClient(private val settings: Settings) {
     
-    companion object {
-        // Cambiar según tu configuración de red
-        // Para Android Emulator: http://10.0.2.2:8081
-        // Para dispositivo físico en misma red: http://192.168.X.X:8081
-        const val BASE_URL = "http://10.0.2.2:8081"
-        private const val TOKEN_KEY = "jwt_token"
-    }
-    
     val client = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -39,17 +31,6 @@ class ApiClient(private val settings: Settings) {
             level = LogLevel.ALL
         }
         
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    val token = settings.get<String>(TOKEN_KEY)
-                    token?.let {
-                        BearerTokens(accessToken = it, refreshToken = "")
-                    }
-                }
-            }
-        }
-        
         install(HttpTimeout) {
             requestTimeoutMillis = 30000
             connectTimeoutMillis = 30000
@@ -57,7 +38,15 @@ class ApiClient(private val settings: Settings) {
         
         defaultRequest {
             contentType(ContentType.Application.Json)
+            val token = settings.get<String>(TOKEN_KEY)
+            if (token != null) {
+                header("Authorization", "Bearer $token")
+            }
         }
+    }
+    
+    companion object {
+        private const val TOKEN_KEY = "jwt_token"
     }
     
     fun saveToken(token: String) {
