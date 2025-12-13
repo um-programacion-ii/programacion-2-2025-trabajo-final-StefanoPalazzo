@@ -166,4 +166,36 @@ class ApiService(private val apiClient: ApiClient) {
             Result.failure(e)
         }
     }
+
+    suspend fun listarVentas(): Result<List<RealizarVentaResponse>> {
+        return try {
+            val url = "${ApiConfig.PROXY_URL}/proxy/listar-ventas"
+            val response = client.get(url)
+            
+            if (response.status == io.ktor.http.HttpStatusCode.OK) {
+                val body = response.body<List<RealizarVentaResponse>>()
+                Result.success(body)
+            } else {
+                Result.failure(Exception("Error al listar ventas: ${response.status}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getVenta(id: Long): Result<RealizarVentaResponse> {
+        return try {
+            val url = "${ApiConfig.PROXY_URL}/proxy/listar-venta/$id"
+            val response = client.get(url)
+            
+            if (response.status == io.ktor.http.HttpStatusCode.OK) {
+                val body = response.body<RealizarVentaResponse>()
+                Result.success(body)
+            } else {
+                Result.failure(Exception("Error al obtener venta $id: ${response.status}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

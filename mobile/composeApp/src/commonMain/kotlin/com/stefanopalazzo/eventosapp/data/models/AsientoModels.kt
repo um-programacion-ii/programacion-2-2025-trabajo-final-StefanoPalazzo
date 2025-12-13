@@ -42,7 +42,8 @@ data class AsientoSimple(
 data class AsientoConEstado(
     val fila: Int,
     val columna: Int,
-    val estado: String
+    val estado: String,
+    val persona: String? = null
 )
 
 @Serializable
@@ -65,7 +66,7 @@ data class RealizarVentaResponse(
     val eventoId: Long,
     val ventaId: Long?,
     val fechaVenta: String,
-    val asientos: List<AsientoConEstado>,
+    val asientos: List<AsientoConEstado>? = null,
     val resultado: Boolean,
     val descripcion: String,
     val precioVenta: Double
