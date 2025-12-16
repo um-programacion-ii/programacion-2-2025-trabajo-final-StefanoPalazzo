@@ -36,3 +36,11 @@ data class ErrorResponse(
     val message: String,
     val timestamp: String
 )
+
+@Serializable
+data class UserProfileResponse(
+    val username: String,
+    val email: String,
+    val firstName: String?,
+    val lastName: String?
+)

@@ -31,6 +31,10 @@ class AuthRepository(
     suspend fun logout(): Result<Unit> {
         return apiService.logout()
     }
+
+    suspend fun getUserProfile(): Result<com.stefanopalazzo.eventosapp.data.models.UserProfileResponse> {
+        return apiService.getUserProfile()
+    }
     
     fun isAuthenticated(): Boolean {
         return apiClient.isAuthenticated()

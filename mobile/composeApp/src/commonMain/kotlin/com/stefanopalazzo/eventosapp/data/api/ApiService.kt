@@ -66,6 +66,19 @@ class ApiService(private val apiClient: ApiClient) {
             Result.failure(e)
         }
     }
+
+    suspend fun getUserProfile(): Result<UserProfileResponse> {
+        return try {
+            val response = client.get("$baseUrl/api/user/me")
+            if (response.status == io.ktor.http.HttpStatusCode.OK) {
+                Result.success(response.body())
+            } else {
+                Result.failure(Exception("Error al obtener perfil: ${response.status}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
     
     // Eventos
     suspend fun getEventos(): Result<List<EventoResumido>> {
