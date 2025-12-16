@@ -19,6 +19,7 @@ fun ProfileScreen(
     viewModel: ProfileViewModel,
     onLogoutSuccess: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     val logoutState by viewModel.logoutState.collectAsState()
 
     LaunchedEffect(logoutState) {
@@ -42,16 +43,43 @@ fun ProfileScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        Text(
-            text = "Usuario",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        
-        Text(
-            text = "usuario@example.com", // Placeholder, idealmente vendría del token/settings
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.Gray
-        )
+        when (val state = uiState) {
+            is ProfileUiState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is ProfileUiState.Error -> {
+                Text(
+                    text = state.message,
+                    color = MaterialTheme.colorScheme.error
+                )
+                Button(onClick = { viewModel.loadProfile() }) {
+                    Text("Reintentar")
+                }
+            }
+            is ProfileUiState.Success -> {
+                val profile = state.profile
+                Text(
+                    text = "${profile.firstName ?: ""} ${profile.lastName ?: ""}".trim().ifEmpty { profile.username },
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = profile.email,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Gray
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = "@${profile.username}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
         
         Spacer(modifier = Modifier.height(48.dp))
         

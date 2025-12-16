@@ -25,7 +25,7 @@ class RegisterViewModel(
         viewModelScope.launch {
             _uiState.value = RegisterUiState(isLoading = true)
             
-            authRepository.register(username, password, email, firstName, lastName)
+            authRepository.register(username.lowercase(), password, email, firstName, lastName)
                 .onSuccess { success ->
                     if (success) {
                         _uiState.value = RegisterUiState(isSuccess = true)
