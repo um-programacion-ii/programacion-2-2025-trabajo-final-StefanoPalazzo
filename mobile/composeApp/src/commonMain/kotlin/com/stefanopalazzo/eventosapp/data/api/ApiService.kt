@@ -154,7 +154,7 @@ class ApiService(private val apiClient: ApiClient) {
     // Venta
     suspend fun realizarVenta(request: RealizarVentaRequest): Result<RealizarVentaResponse> {
         return try {
-            val url = "${ApiConfig.PROXY_URL}/proxy/realizar-venta"
+            val url = "$baseUrl/api/ventas/realizar"
             println("ApiService: Realizando venta en $url")
             println("ApiService: Request body: $request")
             
@@ -182,7 +182,7 @@ class ApiService(private val apiClient: ApiClient) {
 
     suspend fun listarVentas(): Result<List<RealizarVentaResponse>> {
         return try {
-            val url = "${ApiConfig.PROXY_URL}/proxy/listar-ventas"
+            val url = "$baseUrl/api/ventas"
             val response = client.get(url)
             
             if (response.status == io.ktor.http.HttpStatusCode.OK) {

@@ -15,8 +15,13 @@ public class VentaController {
         return ventaService.confirmarVenta(eventoId);
     }
 
+    @PostMapping("/realizar")
+    public RealizarVentaResponse realizarVenta(@RequestBody RealizarVentaDto request) throws Exception {
+        return ventaService.realizarVentaMobile(request);
+    }
+
     @GetMapping
-    public Object listar() {
+    public java.util.List<RealizarVentaResponse> listar() {
         return ventaService.listar();
     }
 }
