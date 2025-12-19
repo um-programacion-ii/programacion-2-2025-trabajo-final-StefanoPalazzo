@@ -201,7 +201,9 @@ fun App() {
                         onSuccess = {
                             // Ir a Mis Entradas después de comprar
                             navController.navigate("tickets") {
-                                popUpTo("event_list") { inclusive = false }
+                                popUpTo("event_list") { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
                             }
                         }
                     )

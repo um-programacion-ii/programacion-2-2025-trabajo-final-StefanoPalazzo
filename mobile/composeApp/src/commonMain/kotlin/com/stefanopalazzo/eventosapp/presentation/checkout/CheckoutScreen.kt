@@ -28,6 +28,7 @@ fun CheckoutScreen(
     
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
+            viewModel.resetSuccessState()
             onSuccess()
         }
     }

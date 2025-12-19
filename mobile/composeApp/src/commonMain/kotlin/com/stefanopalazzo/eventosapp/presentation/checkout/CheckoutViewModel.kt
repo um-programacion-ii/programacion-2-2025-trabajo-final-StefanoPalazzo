@@ -136,4 +136,8 @@ class CheckoutViewModel(
                 }
         }
     }
+    
+    fun resetSuccessState() {
+        _uiState.value = _uiState.value.copy(isSuccess = false)
+    }
 }
