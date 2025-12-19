@@ -41,6 +41,7 @@ import com.stefanopalazzo.eventosapp.presentation.tickets.MyTicketsScreen
 import com.stefanopalazzo.eventosapp.presentation.tickets.MyTicketsViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.navigation.compose.navigation
 
 @Composable
 @Preview
@@ -63,7 +64,9 @@ fun App() {
                             selected = currentRoute == "event_list",
                             onClick = {
                                 navController.navigate("event_list") {
-                                    popUpTo("event_list") { saveState = true }
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -75,7 +78,9 @@ fun App() {
                             selected = currentRoute == "tickets",
                             onClick = {
                                 navController.navigate("tickets") {
-                                    popUpTo("event_list") { saveState = true }
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -87,7 +92,9 @@ fun App() {
                             selected = currentRoute == "profile",
                             onClick = {
                                 navController.navigate("profile") {
-                                    popUpTo("event_list") { saveState = true }
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -124,92 +131,97 @@ fun App() {
                     )
                 }
 
-                composable("event_list") {
-                    val viewModel = koinViewModel<EventListViewModel>()
-                    EventListScreen(
-                        viewModel = viewModel,
-                        onEventClick = { eventoId ->
-                            navController.navigate("event_detail/$eventoId")
-                        }
-                    )
-                }
-
-                composable("tickets") {
-                    val viewModel = koinViewModel<MyTicketsViewModel>()
-                    MyTicketsScreen(viewModel = viewModel)
-                }
-
-                composable("profile") {
-                    val viewModel = koinViewModel<ProfileViewModel>()
-                    ProfileScreen(
-                        viewModel = viewModel,
-                        onLogoutSuccess = {
-                            navController.navigate("login") {
-                                popUpTo("event_list") { inclusive = true }
+                navigation(
+                    startDestination = "event_list",
+                    route = "main_app"
+                ) {
+                    composable("event_list") {
+                        val viewModel = koinViewModel<EventListViewModel>()
+                        EventListScreen(
+                            viewModel = viewModel,
+                            onEventClick = { eventoId ->
+                                navController.navigate("event_detail/$eventoId")
                             }
-                        }
-                    )
-                }
+                        )
+                    }
 
-                composable(
-                    route = "event_detail/{eventoId}",
-                    arguments = listOf(navArgument("eventoId") { type = NavType.LongType })
-                ) { backStackEntry ->
-                    val eventoId = backStackEntry.arguments?.getLong("eventoId") ?: 0L
-                    val viewModel = koinViewModel<EventDetailViewModel>()
-                    EventDetailScreen(
-                        viewModel = viewModel,
-                        eventoId = eventoId,
-                        onBackClick = { navController.popBackStack() },
-                        onSelectSeatsClick = { id ->
-                            navController.navigate("seat_selection/$id")
-                        }
-                    )
-                }
+                    composable("tickets") {
+                        val viewModel = koinViewModel<MyTicketsViewModel>()
+                        MyTicketsScreen(viewModel = viewModel)
+                    }
 
-                composable(
-                    route = "seat_selection/{eventoId}",
-                    arguments = listOf(navArgument("eventoId") { type = NavType.LongType })
-                ) { backStackEntry ->
-                    val eventoId = backStackEntry.arguments?.getLong("eventoId") ?: 0L
-                    val viewModel = koinViewModel<SeatSelectionViewModel>()
-                    SeatSelectionScreen(
-                        viewModel = viewModel,
-                        eventoId = eventoId,
-                        onBackClick = { navController.popBackStack() },
-                        onNavigateToCheckout = { id, asientos ->
-                            navController.navigate("checkout/$id/$asientos")
-                        }
-                    )
-                }
-
-                composable(
-                    route = "checkout/{eventoId}/{asientos}",
-                    arguments = listOf(
-                        navArgument("eventoId") { type = NavType.LongType },
-                        navArgument("asientos") { type = NavType.StringType }
-                    )
-                ) { backStackEntry ->
-                    val eventoId = backStackEntry.arguments?.getLong("eventoId") ?: 0L
-                    val asientosStr = backStackEntry.arguments?.getString("asientos") ?: ""
-                    val viewModel = koinViewModel<CheckoutViewModel>()
-                    CheckoutScreen(
-                        viewModel = viewModel,
-                        eventoId = eventoId,
-                        asientosStr = asientosStr,
-                        onBackClick = { navController.popBackStack() },
-                        onSuccess = {
-                            // Resetear TODO el estado de navegación para evitar bucles
-                            navController.navigate("tickets") {
-                                popUpTo("login") { 
-                                    inclusive = false 
-                                    saveState = false 
+                    composable("profile") {
+                        val viewModel = koinViewModel<ProfileViewModel>()
+                        ProfileScreen(
+                            viewModel = viewModel,
+                            onLogoutSuccess = {
+                                navController.navigate("login") {
+                                    popUpTo("main_app") { inclusive = true }
                                 }
-                                launchSingleTop = true
-                                restoreState = false // No restaurar estados viejos
                             }
-                        }
-                    )
+                        )
+                    }
+
+                    composable(
+                        route = "event_detail/{eventoId}",
+                        arguments = listOf(navArgument("eventoId") { type = NavType.LongType })
+                    ) { backStackEntry ->
+                        val eventoId = backStackEntry.arguments?.getLong("eventoId") ?: 0L
+                        val viewModel = koinViewModel<EventDetailViewModel>()
+                        EventDetailScreen(
+                            viewModel = viewModel,
+                            eventoId = eventoId,
+                            onBackClick = { navController.popBackStack() },
+                            onSelectSeatsClick = { id ->
+                                navController.navigate("seat_selection/$id")
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = "seat_selection/{eventoId}",
+                        arguments = listOf(navArgument("eventoId") { type = NavType.LongType })
+                    ) { backStackEntry ->
+                        val eventoId = backStackEntry.arguments?.getLong("eventoId") ?: 0L
+                        val viewModel = koinViewModel<SeatSelectionViewModel>()
+                        SeatSelectionScreen(
+                            viewModel = viewModel,
+                            eventoId = eventoId,
+                            onBackClick = { navController.popBackStack() },
+                            onNavigateToCheckout = { id, asientos ->
+                                navController.navigate("checkout/$id/$asientos")
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = "checkout/{eventoId}/{asientos}",
+                        arguments = listOf(
+                            navArgument("eventoId") { type = NavType.LongType },
+                            navArgument("asientos") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val eventoId = backStackEntry.arguments?.getLong("eventoId") ?: 0L
+                        val asientosStr = backStackEntry.arguments?.getString("asientos") ?: ""
+                        val viewModel = koinViewModel<CheckoutViewModel>()
+                        CheckoutScreen(
+                            viewModel = viewModel,
+                            eventoId = eventoId,
+                            asientosStr = asientosStr,
+                            onBackClick = { navController.popBackStack() },
+                            onSuccess = {
+                                // Navegar a tickets limpiando todo el flujo de compra
+                                navController.navigate("tickets") {
+                                    popUpTo("event_list") {
+                                        inclusive = false
+                                        saveState = false // NO guardar el estado del flujo de compra
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
