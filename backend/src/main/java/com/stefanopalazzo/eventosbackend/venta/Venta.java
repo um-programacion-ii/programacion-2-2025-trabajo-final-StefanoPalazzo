@@ -15,7 +15,11 @@ public class Venta {
     private int id;
 
     private int eventoId;
-    private String itemsJson;   // lista de asientos vendidos serializada
+    @Column(columnDefinition = "TEXT")
+    private String itemsJson; // lista de asientos vendidos serializada
     private double total;
     private String fecha;
+
+    @Column(name = "user_id", columnDefinition = "BIGINT")
+    private Long userId;
 }

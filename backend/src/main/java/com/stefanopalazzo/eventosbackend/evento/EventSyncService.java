@@ -93,12 +93,12 @@ public class EventSyncService {
         }
     }
 
-    public boolean realizarVenta(int eventoId, double precioVenta, List<Map<String, Object>> asientos) {
+    public boolean realizarVenta(int eventoId, String fecha, double precioVenta, List<Map<String, Object>> asientos) {
         try {
             String url = proxyUrl + "/proxy/realizar-venta";
             Map<String, Object> body = new HashMap<>();
             body.put("eventoId", eventoId);
-            body.put("fecha", LocalDateTime.now().toString());
+            body.put("fecha", fecha);
             body.put("precioVenta", precioVenta);
             body.put("asientos", asientos);
 
