@@ -23,6 +23,7 @@ public class VentaService {
     private final Carrito carrito;
     private final AsientoService asientoService;
     private final UserRepository userRepository;
+    private final com.stefanopalazzo.eventosbackend.evento.EventSyncService eventSyncService;
     private final ObjectMapper mapper = new ObjectMapper();
 
     public Venta confirmarVenta(int eventoId) throws JsonProcessingException {
@@ -61,19 +62,40 @@ public class VentaService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + username));
 
-        // 1) Convertir los asientos del DTO a entidades Asiento
-        List<Asiento> asientos = request.getAsientos().stream().map(dto -> Asiento.builder()
+        // 1) Preparar asientos para el proxy con los datos correctos del mobile
+        List<java.util.Map<String, Object>> asientosParaProxy = new java.util.ArrayList<>();
+        for (AsientoVentaDto dto : request.getAsientos()) {
+            java.util.Map<String, Object> asientoMap = new java.util.HashMap<>();
+            asientoMap.put("fila", dto.getFila());
+            asientoMap.put("columna", dto.getColumna());
+            asientoMap.put("persona", dto.getPersona());
+            asientosParaProxy.add(asientoMap);
+        }
+
+        // 2) Llamar al proxy/cátedra con los datos reales
+        boolean success = eventSyncService.realizarVenta(
+                request.getEventoId().intValue(),
+                request.getFecha(),
+                request.getPrecioVenta(),
+                asientosParaProxy);
+        if (!success) {
+            throw new RuntimeException("La venta fue rechazada por la cátedra");
+        }
+
+        // 3) Crear asientos sold para guardar localmente
+        List<Asiento> vendidos = request.getAsientos().stream().map(dto -> Asiento.builder()
                 .eventoId(request.getEventoId().intValue())
                 .fila(dto.getFila())
                 .columna(dto.getColumna())
                 .estado(com.stefanopalazzo.eventosbackend.asiento.AsientoEstado.VENDIDO)
                 .precio(request.getPrecioVenta() / request.getAsientos().size())
+                .persona(dto.getPersona())
                 .build()).collect(java.util.stream.Collectors.toList());
 
-        // 2) Serializar asientos
-        String json = mapper.writeValueAsString(asientos);
+        // 4) Serializar asientos
+        String json = mapper.writeValueAsString(vendidos);
 
-        // 3) Guardar venta
+        // 5) Guardar venta
         Venta venta = Venta.builder()
                 .eventoId(request.getEventoId().intValue())
                 .itemsJson(json)
@@ -84,7 +106,7 @@ public class VentaService {
 
         ventaRepository.save(venta);
 
-        // 4) Retornar respuesta
+        // 6) Retornar respuesta
         return RealizarVentaResponse.builder()
                 .ventaId((long) venta.getId())
                 .eventoId(request.getEventoId())
@@ -92,7 +114,7 @@ public class VentaService {
                 .precioVenta(request.getPrecioVenta())
                 .resultado(true)
                 .descripcion("Venta confirmada")
-                .asientos(asientos)
+                .asientos(vendidos)
                 .build();
     }
 

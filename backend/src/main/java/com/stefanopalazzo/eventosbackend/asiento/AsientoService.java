@@ -115,7 +115,8 @@ public class AsientoService {
             totalPrecio += 1000.0;
         }
 
-        boolean success = eventSyncService.realizarVenta(eventoId, totalPrecio, asientosParaProxy);
+        boolean success = eventSyncService.realizarVenta(eventoId, java.time.LocalDateTime.now().toString(),
+                totalPrecio, asientosParaProxy);
 
         if (!success) {
             throw new RuntimeException("La venta fue rechazada por la cátedra");

@@ -23,4 +23,6 @@ public class Asiento {
     private AsientoEstado estado;
 
     private double precio;
+
+    private String persona;
 }
