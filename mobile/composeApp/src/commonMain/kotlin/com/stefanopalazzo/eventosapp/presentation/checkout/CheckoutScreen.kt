@@ -25,13 +25,14 @@ fun CheckoutScreen(
     LaunchedEffect(eventoId, asientosStr) {
         viewModel.loadData(eventoId, asientosStr)
     }
-    
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
-            viewModel.resetSuccessState()
-            onSuccess()
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is CheckoutEvent.NavigateToTickets -> onSuccess()
+            }
         }
     }
+
     
     Scaffold(
         topBar = {

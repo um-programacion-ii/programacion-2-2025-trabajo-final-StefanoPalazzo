@@ -199,11 +199,14 @@ fun App() {
                         asientosStr = asientosStr,
                         onBackClick = { navController.popBackStack() },
                         onSuccess = {
-                            // Ir a Mis Entradas después de comprar
+                            // Resetear TODO el estado de navegación para evitar bucles
                             navController.navigate("tickets") {
-                                popUpTo("event_list") { saveState = true }
+                                popUpTo("login") { 
+                                    inclusive = false 
+                                    saveState = false 
+                                }
                                 launchSingleTop = true
-                                restoreState = true
+                                restoreState = false // No restaurar estados viejos
                             }
                         }
                     )

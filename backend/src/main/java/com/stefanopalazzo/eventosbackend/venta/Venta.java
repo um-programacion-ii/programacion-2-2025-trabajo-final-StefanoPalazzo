@@ -15,6 +15,7 @@ public class Venta {
     private int id;
 
     private int eventoId;
+    @Column(columnDefinition = "TEXT")
     private String itemsJson; // lista de asientos vendidos serializada
     private double total;
     private String fecha;

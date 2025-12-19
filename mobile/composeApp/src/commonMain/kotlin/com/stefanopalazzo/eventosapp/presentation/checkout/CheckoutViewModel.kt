@@ -8,9 +8,11 @@ import com.stefanopalazzo.eventosapp.data.models.AsientoSimple
 import com.stefanopalazzo.eventosapp.data.models.EventoCompleto
 import com.stefanopalazzo.eventosapp.data.models.RealizarVentaRequest
 import com.stefanopalazzo.eventosapp.data.repository.EventoRepository
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
@@ -20,9 +22,12 @@ data class CheckoutUiState(
     val nombres: Map<String, String> = emptyMap(), // Key: "fila:columna", Value: Nombre
     val isLoading: Boolean = false,
     val isProcessing: Boolean = false,
-    val isSuccess: Boolean = false,
     val error: String? = null
 )
+
+sealed class CheckoutEvent {
+    object NavigateToTickets : CheckoutEvent()
+}
 
 class CheckoutViewModel(
     private val eventoRepository: EventoRepository,
@@ -31,6 +36,9 @@ class CheckoutViewModel(
     
     private val _uiState = MutableStateFlow(CheckoutUiState())
     val uiState: StateFlow<CheckoutUiState> = _uiState.asStateFlow()
+
+    private val _events = Channel<CheckoutEvent>()
+    val events = _events.receiveAsFlow()
     
     fun loadData(eventoId: Long, asientosStr: String) {
         viewModelScope.launch {
@@ -117,10 +125,8 @@ class CheckoutViewModel(
             apiService.realizarVenta(request)
                 .onSuccess { response ->
                     if (response.resultado) {
-                        _uiState.value = state.copy(
-                            isProcessing = false,
-                            isSuccess = true
-                        )
+                        _uiState.value = state.copy(isProcessing = false)
+                        _events.send(CheckoutEvent.NavigateToTickets)
                     } else {
                         _uiState.value = state.copy(
                             isProcessing = false,
@@ -135,9 +141,5 @@ class CheckoutViewModel(
                     )
                 }
         }
-    }
-    
-    fun resetSuccessState() {
-        _uiState.value = _uiState.value.copy(isSuccess = false)
     }
 }
